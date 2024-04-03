@@ -1,85 +1,170 @@
-import { App, Editor, MarkdownView, Modal, Notice, Plugin, PluginSettingTab, Setting } from 'obsidian';
+import {debounce, getAllTags, MarkdownView, normalizePath, Notice, Plugin, TAbstractFile, TFile} from 'obsidian';
+import {FileMetadata, Rule, RuleProcessor} from 'src/RuleProcessor'
+import {
+	AutoFileGrouperSettingTab,
+	DEFAULT_SETTINGS,
+	FolderByTagGroupingSettings,
+	FolderGroupPattern,
+	pluginName
+} from './src/settings';
+import {fileMove, getTriggerIndicator, isFmDisable} from 'src/utils';
 
-// Remember to rename these classes and interfaces!
-
-interface MyPluginSettings {
-	mySetting: string;
-}
-
-const DEFAULT_SETTINGS: MyPluginSettings = {
-	mySetting: 'default'
-}
-
-export default class MyPlugin extends Plugin {
-	settings: MyPluginSettings;
+export default class FolderByTagGrouping extends Plugin {
+	settings: FolderByTagGroupingSettings;
 
 	async onload() {
 		await this.loadSettings();
+		const folderTagPattern = this.settings.groupingPatters;
+		const excludedFolder = this.settings.excludedFolder;
 
-		// This creates an icon in the left ribbon.
-		const ribbonIconEl = this.addRibbonIcon('dice', 'Sample Plugin', (evt: MouseEvent) => {
-			// Called when the user clicks the icon.
-			new Notice('This is a notice!');
-		});
-		// Perform additional things with the ribbon
-		ribbonIconEl.addClass('my-plugin-ribbon-class');
 
-		// This adds a status bar item to the bottom of the app. Does not work on mobile apps.
-		const statusBarItemEl = this.addStatusBarItem();
-		statusBarItemEl.setText('Status Bar Text');
-
-		// This adds a simple command that can be triggered anywhere
-		this.addCommand({
-			id: 'open-sample-modal-simple',
-			name: 'Open sample modal (simple)',
-			callback: () => {
-				new SampleModal(this.app).open();
+		const fileCheck = (file: TAbstractFile, oldPath?: string, caller?: string) => {
+			if (!this.settings.autoTrigger && caller !== 'cmd') {
+				return;
 			}
-		});
-		// This adds an editor command that can perform some operation on the current editor instance
-		this.addCommand({
-			id: 'sample-editor-command',
-			name: 'Sample editor command',
-			editorCallback: (editor: Editor, view: MarkdownView) => {
-				console.log(editor.getSelection());
-				editor.replaceSelection('Sample Editor Command');
+			if (!(file instanceof TFile)) return;
+
+			// The rename event with no basename change will be terminated.
+			if (oldPath && oldPath.split('/').pop() === file.basename + '.' + file.extension) {
+				return;
 			}
-		});
-		// This adds a complex command that can check whether the current state of the app allows execution of the command
-		this.addCommand({
-			id: 'open-sample-modal-complex',
-			name: 'Open sample modal (complex)',
-			checkCallback: (checking: boolean) => {
-				// Conditions to check
-				const markdownView = this.app.workspace.getActiveViewOfType(MarkdownView);
-				if (markdownView) {
-					// If checking is true, we're simply "checking" if the command can be run.
-					// If checking is false, then we want to actually perform the operation.
-					if (!checking) {
-						new SampleModal(this.app).open();
+
+			// Excluded Folder check
+			const excludedFolderLength = excludedFolder.length;
+			for (let i = 0; i < excludedFolderLength; i++) {
+				if (
+					!this.settings.regexExcludedTagChecker &&
+					excludedFolder[i].folder &&
+					file.parent?.path === normalizePath(excludedFolder[i].folder)
+				) {
+					return;
+				} else if (this.settings.regexExcludedTagChecker && excludedFolder[i].folder) {
+					const regex = new RegExp(excludedFolder[i].folder);
+					if (file.parent) {
+						if (regex.test(file.parent.path)) {
+							return;
+						}
 					}
-
-					// This command will only show up in Command Palette when the check function returns true
-					return true;
 				}
 			}
+
+			const fileCache = this.app.metadataCache.getFileCache(file);
+			if (null === fileCache || isFmDisable(fileCache)) {
+				return;
+			}
+
+			// transform pattern settings to Rules
+			const rules: Rule[] = folderTagPattern.map((ftp:FolderGroupPattern) => ({
+				tagMatch: ftp.tag,
+				pathSpec: ftp.folder
+			}));
+
+			const rp = new RuleProcessor(rules);
+
+			const fileName = file.basename;
+			const fileFullName = file.basename + '.' + file.extension;
+
+			const fileMetadata: FileMetadata = {
+				tags: getAllTags(fileCache)??[],
+				title: fileName,
+				frontMatter: fileCache.frontmatter ?? {}
+			}
+
+			const movePath = rp.getDestinationPath(fileMetadata);
+			if (movePath) {
+				console.log('movePath', movePath);
+				fileMove(this, movePath, fileFullName, file);
+			}
+		};
+
+		// Show trigger indicator on status bar
+		let triggerIndicator: HTMLElement;
+		const setIndicator = () => {
+			if (!this.settings.triggerStatusBarIndicator) return;
+			triggerIndicator.setText(getTriggerIndicator(this.settings.autoTrigger));
+		};
+		if (this.settings.triggerStatusBarIndicator) {
+			triggerIndicator = this.addStatusBarItem();
+			setIndicator();
+			// TODO: Find a better way
+			this.registerDomEvent(window, 'change', setIndicator);
+		}
+
+		this.app.workspace.onLayoutReady(() => {
+			this.registerEvent(this.app.vault.on('create', (file) => debounce(fileCheck, 200, true)(file)));
+			this.registerEvent(this.app.metadataCache.on('changed', (file) => debounce(fileCheck, 200, true)(file)));
+			this.registerEvent(this.app.vault.on('rename', (file, oldPath) => debounce(fileCheck, 200, true)(file, oldPath)));
 		});
 
-		// This adds a settings tab so the user can configure various aspects of the plugin
-		this.addSettingTab(new SampleSettingTab(this.app, this));
+		const moveNoteCommand = (view: MarkdownView) => {
+			const {file} = view
+			if (null === file) {
+				throw new Error(`${pluginName} no file specified`)
+			}
+			const data = this.app.metadataCache.getFileCache(file)
+			if (null ===data) {
+				throw new Error(`${pluginName} No file metadata found`)
+			}
+			if (isFmDisable(data)) {
+				new Notice(`${pluginName} is disabled in the frontmatter.`);
+				return;
+			}
+			fileCheck(file, undefined, 'cmd');
+		};
 
-		// If the plugin hooks up any global DOM events (on parts of the app that doesn't belong to this plugin)
-		// Using this function will automatically remove the event listener when this plugin is disabled.
-		this.registerDomEvent(document, 'click', (evt: MouseEvent) => {
-			console.log('click', evt);
+		const moveAllNotesCommand = () => {
+			const files = this.app.vault.getMarkdownFiles();
+			const filesLength = files.length;
+			for (let i = 0; i < filesLength; i++) {
+				fileCheck(files[i], undefined, 'cmd');
+			}
+			new Notice(`All ${filesLength} notes have been moved.`);
+		};
+
+		this.addCommand({
+			id: 'Move-the-note',
+			name: 'Move the note',
+			checkCallback: (checking: boolean) => {
+				const markdownView = this.app.workspace.getActiveViewOfType(MarkdownView);
+				if (markdownView) {
+					if (!checking) {
+						moveNoteCommand(markdownView);
+					}
+					return true;
+				}
+			},
 		});
 
-		// When registering intervals, this function will automatically clear the interval when the plugin is disabled.
-		this.registerInterval(window.setInterval(() => console.log('setInterval'), 5 * 60 * 1000));
+		this.addCommand({
+			id: 'Move-all-notes',
+			name: 'Move all notes',
+			callback: () => {
+				moveAllNotesCommand();
+			},
+		});
+
+		this.addCommand({
+			id: 'Toggle-Auto',
+			name: 'Toggle Auto',
+			callback: () => {
+				if (this.settings.autoTrigger) {
+					this.settings.autoTrigger = false;
+					this.saveData(this.settings);
+					new Notice(`[${pluginName}] Trigger is Manual.`);
+				} else if (!this.settings.autoTrigger) {
+					this.settings.autoTrigger = true;
+					this.saveData(this.settings);
+					new Notice(`[${pluginName}]
+Trigger is Automatic.`);
+				}
+				setIndicator();
+			},
+		});
+
+		this.addSettingTab(new AutoFileGrouperSettingTab(this.app, this));
 	}
 
 	onunload() {
-
 	}
 
 	async loadSettings() {
@@ -88,47 +173,5 @@ export default class MyPlugin extends Plugin {
 
 	async saveSettings() {
 		await this.saveData(this.settings);
-	}
-}
-
-class SampleModal extends Modal {
-	constructor(app: App) {
-		super(app);
-	}
-
-	onOpen() {
-		const {contentEl} = this;
-		contentEl.setText('Woah!');
-	}
-
-	onClose() {
-		const {contentEl} = this;
-		contentEl.empty();
-	}
-}
-
-class SampleSettingTab extends PluginSettingTab {
-	plugin: MyPlugin;
-
-	constructor(app: App, plugin: MyPlugin) {
-		super(app, plugin);
-		this.plugin = plugin;
-	}
-
-	display(): void {
-		const {containerEl} = this;
-
-		containerEl.empty();
-
-		new Setting(containerEl)
-			.setName('Setting #1')
-			.setDesc('It\'s a secret')
-			.addText(text => text
-				.setPlaceholder('Enter your secret')
-				.setValue(this.plugin.settings.mySetting)
-				.onChange(async (value) => {
-					this.plugin.settings.mySetting = value;
-					await this.plugin.saveSettings();
-				}));
 	}
 }
