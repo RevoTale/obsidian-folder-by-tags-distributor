@@ -1,11 +1,10 @@
 {
-	"id": "sample-plugin",
-	"name": "Sample Plugin",
+	"id": "auto-folder-by-tags",
+	"name": "Folder By Tags Grouping",
 	"version": "1.0.0",
 	"minAppVersion": "0.15.0",
-	"description": "Demonstrates some of the capabilities of the Obsidian API.",
-	"author": "Obsidian",
-	"authorUrl": "https://obsidian.md",
-	"fundingUrl": "https://obsidian.md/pricing",
+	"description": "Automatically group Obsidian notes into folder by tags specified in note.",
+	"author": "RevoTale",
+	"authorUrl": "https://revotale.com",
 	"isDesktopOnly": false
 }

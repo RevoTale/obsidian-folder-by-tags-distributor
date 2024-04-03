@@ -1,5 +1,5 @@
 {
-	"name": "obsidian-auto-folder-by-tag-plugin",
+	"name": "obsidian-auto-folder-by-tags-plugin",
 	"version": "1.0.0",
 	"description": "Automatically group Obsidian notes into folder by tags specified in note.",
 	"main": "main.js",
