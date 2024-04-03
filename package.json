@@ -1,7 +1,7 @@
 {
-	"name": "obsidian-sample-plugin",
+	"name": "obsidian-auto-folder-by-tag-plugin",
 	"version": "1.0.0",
-	"description": "This is a sample plugin for Obsidian (https://obsidian.md)",
+	"description": "Automatically group Obsidian notes into folder by tags specified in note.",
 	"main": "main.js",
 	"scripts": {
 		"dev": "node esbuild.config.mjs",
