@@ -11,19 +11,30 @@ export type FolderByTagsDistributorSettings = {
 	useFrontMatterTags: boolean
 	useContentTags: boolean
 }
+const stripTag = (tag: string): string => {
+	return tag.replace(/^#/, '');
+}
+const normalizeFolderPath = (name: string) => {
+	if (name === '/') {
+		return ''
+	}
+	return name
+}
 export default class FolderByTagsDistributor extends Plugin {
 	settings: FolderByTagsDistributorSettings;
 
 	private getExistingFolderForTags(tags: string[]): TFolder | null {
 		let currentFolder = this.app.vault.getRoot()
-		for (const tag in tags) {
-			const newPath = `${currentFolder.path}/${tag}`
+		for (const tag of tags) {
+			const newPath = `${normalizeFolderPath(currentFolder.path)}${stripTag(tag)}`
+
 			const folder = this.app.vault.getFolderByPath(newPath)
 			if (folder) {
 				currentFolder = folder
 			}
+
 		}
-		console.log(`Found folder ${currentFolder.path} for tags ${tags.join(', ')}.`)
+		console.log(`Found folder ${currentFolder.path} for tags ${tags.join(', ')}`)
 		return currentFolder
 	}
 
@@ -58,21 +69,20 @@ export default class FolderByTagsDistributor extends Plugin {
 				const folderForTags = this.getExistingFolderForTags(tags)
 				if (folderForTags) {
 					if (file.parent?.path !== folderForTags.path) {
-						new Notice(`Moving file ${file.name} to ${folderForTags.path}`)
-						await this.app.vault.rename(file, `${folderForTags.path}/${file.name}`)
+						new Notice(`Moving file "${file.name}" to "${folderForTags.path}" folder`)
+						await this.app.vault.rename(file, `${normalizeFolderPath(folderForTags.path)}/${file.name}`)
 					}
 				}
 			}
 		}
 	}
 
-	async onload() {
-		await this.loadSettings();
+	private loadLayout() {
 		this.addCommand({
 			id: 'redistribute-all-notes-between-the-folders-by-tags',
 			name: "Redistribute All Notes Between The Folders By Tags",
 			callback: () => {
-				this.redistributeAllNotes()
+				void this.redistributeAllNotes()
 			},
 		});
 		if (this.settings.addRibbon) {
@@ -83,15 +93,18 @@ export default class FolderByTagsDistributor extends Plugin {
 						.setTitle("Redistribute")
 						.setIcon("sync")
 						.onClick(() => {
-							this.redistributeAllNotes()
+							void this.redistributeAllNotes()
 						})
 				);
-
-
 				menu.showAtMouseEvent(event);
 			});
 		}
 		this.addSettingTab(new PluginSettingsTab(this.app, this));
+	}
+
+	async onload() {
+		await this.loadSettings();
+		this.loadLayout()
 	}
 
 
