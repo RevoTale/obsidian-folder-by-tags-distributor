@@ -16,7 +16,7 @@ export class PluginSettingsTab extends PluginSettingTab {
 
 		new Setting(containerEl)
 			.setName("Enable Ribbon Button")
-			.setDesc(sanitizeHTMLToDom("Display the Sync button on the left <b>Heads up!</b> Reload obsidian to apply the changes."))
+			.setDesc(sanitizeHTMLToDom("Display the Sync button on the left <b>Heads up!</b> Reload Obsidian to apply the changes."))
 			.addToggle((component) =>
 				component
 					.setValue(this.plugin.settings.addRibbon)

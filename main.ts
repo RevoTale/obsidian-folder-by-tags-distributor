@@ -1,4 +1,4 @@
-import {Menu, Notice, parseFrontMatterTags, Plugin, TFile, TFolder} from 'obsidian';
+import {Notice, parseFrontMatterTags, Plugin, TFile, TFolder} from 'obsidian';
 import {PluginSettingsTab} from "./src/PluginSettingsTab";
 
 export const DEFAULT_SETTINGS: FolderByTagsDistributorSettings = {
@@ -110,23 +110,14 @@ export default class FolderByTagsDistributor extends Plugin {
 	private loadLayout() {
 		this.addCommand({
 			id: 'redistribute-all-notes-between-the-folders-by-tags',
-			name: "Redistribute All Notes Between The Folders By Tags",
+			name: "Redistribute all notes by tags",
 			callback: () => {
 				void this.redistributeAllNotes()
 			},
 		});
 		if (this.settings.addRibbon) {
-			this.addRibbonIcon("sync", "Redistribute All Notes Between The Folders By Tags", (event) => {
-				const menu = new Menu();
-				menu.addItem((item) =>
-					item
-						.setTitle("Redistribute")
-						.setIcon("sync")
-						.onClick(() => {
-							void this.redistributeAllNotes()
-						})
-				);
-				menu.showAtMouseEvent(event);
+			this.addRibbonIcon("sync", "Redistribute All Notes Between The Folders By Tags", () => {
+				void this.redistributeAllNotes()
 			});
 		}
 		this.addSettingTab(new PluginSettingsTab(this.app, this));
