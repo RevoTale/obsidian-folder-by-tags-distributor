@@ -5,11 +5,13 @@ export const DEFAULT_SETTINGS: FolderByTagsDistributorSettings = {
 	addRibbon: false,
 	useContentTags: false,
 	useFrontMatterTags: true,
+	forceSequentialTags:false
 }
 export type FolderByTagsDistributorSettings = {
 	addRibbon: boolean
 	useFrontMatterTags: boolean
 	useContentTags: boolean
+	forceSequentialTags:boolean
 }
 const stripTag = (tag: string): string => {
 	return tag.replace(/^#/, '');
@@ -52,16 +54,36 @@ export default class FolderByTagsDistributor extends Plugin {
 		return this.app.vault.getFolderByPath(newPath)
 	}
 
+	private resolveFolderName(currentFolder: TFolder, tag: string): TFolder | null {
+		return  this.getExactFolder(currentFolder, tag)
+			|| this.getUpperLetterFolder(currentFolder, tag)
+			|| this.getCapitalizedFolder(currentFolder, tag)
+			|| this.getUnderScoreFolder(currentFolder, tag)
+	}
+
 	private getExistingFolderForTags(tags: string[]): TFolder | null {
 		let currentFolder = this.app.vault.getRoot()
-		for (const tag of tags) {
-			const folder = this.getExactFolder(currentFolder, tag)
-				|| this.getUpperLetterFolder(currentFolder, tag)
-				|| this.getCapitalizedFolder(currentFolder, tag)
-				|| this.getUnderScoreFolder(currentFolder, tag)
-			;
-			if (folder) {
-				currentFolder = folder
+		if (this.settings.forceSequentialTags) {
+			for (const tag of tags) {
+				const folder = this.resolveFolderName(currentFolder,tag);
+				if (folder) {
+					currentFolder = folder
+				}
+			}
+		} else {
+			const remainingTags =  [...tags]
+			for (let i=0;i<remainingTags.length;i++) {
+				const currentTag = remainingTags[i]
+				if (!currentTag) {
+					console.error(`Accessed bad index ${i}`)
+					break
+				}
+				const folder = this.resolveFolderName(currentFolder,currentTag);
+				if (folder) {
+					currentFolder = folder
+					remainingTags.remove(currentTag)
+					i = 0
+				}
 			}
 		}
 		console.log(`Found folder ${currentFolder.path} for tags ${tags.join(', ')}`)
