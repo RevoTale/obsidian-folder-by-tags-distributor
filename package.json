@@ -9,7 +9,11 @@
 		"version": "node version-bump.mjs && git add manifest.json versions.json"
 	},
 	"keywords": [],
-	"author": "",
+	"author": {
+		"url": "https://revotale.com",
+		"name": "Literally You",
+		"email": "rusted@revotale.com"
+	},
 	"license": "MIT",
 	"devDependencies": {
 		"@types/node": "^16.18.94",
