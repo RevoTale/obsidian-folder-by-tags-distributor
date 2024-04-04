@@ -1,6 +1,6 @@
 {
 	"name": "obsidian-folder-by-tags-distributor",
-	"version": "1.0.10",
+	"version": "1.0.14",
 	"description": "Automatically move Obsidian notes into existing folders by tags specified in note.",
 	"main": "main.js",
 	"scripts": {
