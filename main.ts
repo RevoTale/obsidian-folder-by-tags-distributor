@@ -110,13 +110,13 @@ export default class FolderByTagsDistributor extends Plugin {
 	private loadLayout() {
 		this.addCommand({
 			id: 'redistribute-all-notes-between-the-folders-by-tags',
-			name: "Redistribute all notes by tags",
+			name: "Redistribute all notes to folder by tags",
 			callback: () => {
 				void this.redistributeAllNotes()
 			},
 		});
 		if (this.settings.addRibbon) {
-			this.addRibbonIcon("sync", "Redistribute All Notes Between The Folders By Tags", () => {
+			this.addRibbonIcon("sync", "Redistribute all notes to folder by tags", () => {
 				void this.redistributeAllNotes()
 			});
 		}
