@@ -20,19 +20,49 @@ const normalizeFolderPath = (name: string) => {
 	}
 	return name
 }
+const capitalizeFirstLetter = (string: string) => {
+	return string.charAt(0).toUpperCase() + string.slice(1);
+}
 export default class FolderByTagsDistributor extends Plugin {
 	settings: FolderByTagsDistributorSettings;
+
+	private getExactFolder(currentFolder: TFolder, tag: string): TFolder | null {
+		const newPath = `${normalizeFolderPath(currentFolder.path)}${stripTag(tag)}`
+
+		return this.app.vault.getFolderByPath(newPath)
+	}
+
+	private getUpperLetterFolder(currentFolder: TFolder, tag: string): TFolder | null {
+		const newPath = `${normalizeFolderPath(currentFolder.path)}${capitalizeFirstLetter(stripTag(tag))}`
+
+		return this.app.vault.getFolderByPath(newPath)
+	}
+
+	private getCapitalizedFolder(currentFolder: TFolder, tag: string): TFolder | null {
+		const newPath = `${normalizeFolderPath(currentFolder.path)}${(stripTag(tag).toUpperCase())}`
+
+		return this.app.vault.getFolderByPath(newPath)
+	}
+
+	private getUnderScoreFolder(currentFolder: TFolder, tag: string): TFolder | null {
+		tag = stripTag(tag)
+		const words = tag.split('_').map(word => capitalizeFirstLetter(word))
+		const newPath = `${normalizeFolderPath(currentFolder.path)}${(words.join(' '))}`
+
+		return this.app.vault.getFolderByPath(newPath)
+	}
 
 	private getExistingFolderForTags(tags: string[]): TFolder | null {
 		let currentFolder = this.app.vault.getRoot()
 		for (const tag of tags) {
-			const newPath = `${normalizeFolderPath(currentFolder.path)}${stripTag(tag)}`
-
-			const folder = this.app.vault.getFolderByPath(newPath)
+			const folder = this.getExactFolder(currentFolder, tag)
+				|| this.getUpperLetterFolder(currentFolder, tag)
+				|| this.getCapitalizedFolder(currentFolder, tag)
+				|| this.getUnderScoreFolder(currentFolder, tag)
+			;
 			if (folder) {
 				currentFolder = folder
 			}
-
 		}
 		console.log(`Found folder ${currentFolder.path} for tags ${tags.join(', ')}`)
 		return currentFolder
