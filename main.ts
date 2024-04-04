@@ -1,4 +1,4 @@
-import {Menu, parseFrontMatterTags, Plugin, TFile, TFolder} from 'obsidian';
+import {Menu, Notice, parseFrontMatterTags, Plugin, TFile, TFolder} from 'obsidian';
 import {PluginSettingsTab} from "./src/PluginSettingsTab";
 
 export const DEFAULT_SETTINGS: FolderByTagsDistributorSettings = {
@@ -23,6 +23,7 @@ export default class FolderByTagsDistributor extends Plugin {
 				currentFolder = folder
 			}
 		}
+		console.log(`Found folder ${currentFolder.path} for tags ${tags.join(', ')}.`)
 		return currentFolder
 	}
 
@@ -52,10 +53,12 @@ export default class FolderByTagsDistributor extends Plugin {
 		const files = this.app.vault.getMarkdownFiles()
 		for (const file of files) {
 			const tags = this.resolveTagsForFolderDistribution(file)
+			console.log(`Resolving file ${file.path} for tags ${tags?.join(', ')}`)
 			if (tags && tags.length > 0) {
 				const folderForTags = this.getExistingFolderForTags(tags)
 				if (folderForTags) {
 					if (file.parent?.path !== folderForTags.path) {
+						new Notice(`Moving file ${file.name} to ${folderForTags.path}`)
 						await this.app.vault.rename(file, `${folderForTags.path}/${file.name}`)
 					}
 				}
@@ -64,13 +67,12 @@ export default class FolderByTagsDistributor extends Plugin {
 	}
 
 	async onload() {
-		const {redistributeAllNotes} = this
 		await this.loadSettings();
 		this.addCommand({
 			id: 'redistribute-all-notes-between-the-folders-by-tags',
 			name: "Redistribute All Notes Between The Folders By Tags",
 			callback: () => {
-				redistributeAllNotes()
+				this.redistributeAllNotes()
 			},
 		});
 		if (this.settings.addRibbon) {
@@ -81,7 +83,7 @@ export default class FolderByTagsDistributor extends Plugin {
 						.setTitle("Redistribute")
 						.setIcon("sync")
 						.onClick(() => {
-							redistributeAllNotes()
+							this.redistributeAllNotes()
 						})
 				);
 
