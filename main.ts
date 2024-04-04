@@ -5,13 +5,13 @@ export const DEFAULT_SETTINGS: FolderByTagsDistributorSettings = {
 	addRibbon: false,
 	useContentTags: false,
 	useFrontMatterTags: true,
-	forceSequentialTags:false
+	forceSequentialTags: false
 }
 export type FolderByTagsDistributorSettings = {
 	addRibbon: boolean
 	useFrontMatterTags: boolean
 	useContentTags: boolean
-	forceSequentialTags:boolean
+	forceSequentialTags: boolean
 }
 const stripTag = (tag: string): string => {
 	return tag.replace(/^#/, '');
@@ -28,66 +28,82 @@ const capitalizeFirstLetter = (string: string) => {
 export default class FolderByTagsDistributor extends Plugin {
 	settings: FolderByTagsDistributorSettings;
 
-	private getExactFolder(currentFolder: TFolder, tag: string): TFolder | null {
-		const newPath = `${normalizeFolderPath(currentFolder.path)}${stripTag(tag)}`
-
-		return this.app.vault.getFolderByPath(newPath)
+	private getExactFolder(tag: string): string {
+		return stripTag(tag)
 	}
 
-	private getUpperLetterFolder(currentFolder: TFolder, tag: string): TFolder | null {
-		const newPath = `${normalizeFolderPath(currentFolder.path)}${capitalizeFirstLetter(stripTag(tag))}`
+	private getUpperLetterFolder(tag: string): string {
+		return capitalizeFirstLetter(stripTag(tag))
 
-		return this.app.vault.getFolderByPath(newPath)
 	}
 
-	private getCapitalizedFolder(currentFolder: TFolder, tag: string): TFolder | null {
-		const newPath = `${normalizeFolderPath(currentFolder.path)}${(stripTag(tag).toUpperCase())}`
-
-		return this.app.vault.getFolderByPath(newPath)
+	private getCapitalizedFolder(tag: string): string {
+		return stripTag(tag).toUpperCase()
 	}
 
-	private getUnderScoreFolder(currentFolder: TFolder, tag: string): TFolder | null {
-		tag = stripTag(tag)
-		const words = tag.split('_').map(word => capitalizeFirstLetter(word))
-		const newPath = `${normalizeFolderPath(currentFolder.path)}${(words.join(' '))}`
-
-		return this.app.vault.getFolderByPath(newPath)
+	private getUnderScoreFolder(tag: string): string {
+		return stripTag(tag).split('_').map(word => capitalizeFirstLetter(word)).join(' ')
 	}
 
 	private resolveFolderName(currentFolder: TFolder, tag: string): TFolder | null {
-		return  this.getExactFolder(currentFolder, tag)
-			|| this.getUpperLetterFolder(currentFolder, tag)
-			|| this.getCapitalizedFolder(currentFolder, tag)
-			|| this.getUnderScoreFolder(currentFolder, tag)
+		console.log('fname', currentFolder.path, tag)
+		for (const func of [this.getExactFolder, this.getUpperLetterFolder, this.getCapitalizedFolder, this.getUnderScoreFolder]) {
+			const strippedTag = stripTag(tag)
+			const currenFolderPath = normalizeFolderPath(currentFolder.path)
+			const childFolderName = func(strippedTag)
+			const folderPath = currenFolderPath === '' ? childFolderName : `${currenFolderPath}/${childFolderName}`
+			const folder = this.app.vault.getFolderByPath(folderPath)
+			console.log(folderPath, folder, this.app.vault.getAllLoadedFiles())
+			if (folder) {
+				return folder
+			}
+
+		}
+		return null
+	}
+
+	private fulfilAlgo(tags: string[]): TFolder {
+		let currentFolder = this.app.vault.getRoot()
+		const remainingTags = [...tags]
+		let i = 0
+		while (i < remainingTags.length) {
+			const currentTag = remainingTags[i]
+			if (!currentTag) {
+				console.error(`Accessed bad index ${i}`)
+				break
+			}
+			const folder = this.resolveFolderName(currentFolder, currentTag);
+			if (folder) {
+				currentFolder = folder
+				console.log(remainingTags)
+
+				remainingTags.remove(currentTag)
+				console.log(remainingTags)
+				i = 0
+			} else {
+				i++
+			}
+
+		}
+		return currentFolder
+	}
+
+	private sequentialAlgo(tags: string[]): TFolder {
+		let currentFolder = this.app.vault.getRoot()
+		for (const tag of tags) {
+			const folder = this.resolveFolderName(currentFolder, tag);
+			if (folder) {
+				currentFolder = folder
+			}
+		}
+		return currentFolder
 	}
 
 	private getExistingFolderForTags(tags: string[]): TFolder | null {
-		let currentFolder = this.app.vault.getRoot()
 		if (this.settings.forceSequentialTags) {
-			for (const tag of tags) {
-				const folder = this.resolveFolderName(currentFolder,tag);
-				if (folder) {
-					currentFolder = folder
-				}
-			}
-		} else {
-			const remainingTags =  [...tags]
-			for (let i=0;i<remainingTags.length;i++) {
-				const currentTag = remainingTags[i]
-				if (!currentTag) {
-					console.error(`Accessed bad index ${i}`)
-					break
-				}
-				const folder = this.resolveFolderName(currentFolder,currentTag);
-				if (folder) {
-					currentFolder = folder
-					remainingTags.remove(currentTag)
-					i = 0
-				}
-			}
+			this.sequentialAlgo(tags)
 		}
-		//console.log(`Found folder ${currentFolder.path} for tags ${tags.join(', ')}`)
-		return currentFolder
+		return this.fulfilAlgo(tags)
 	}
 
 	private resolveTagsForFolderDistribution(file: TFile) {
