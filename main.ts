@@ -1,21 +1,69 @@
-import {Menu, Plugin} from 'obsidian';
-export const DEFAULT_SETTINGS:FolderByTagsDistributorSettings = {
-	addRibbon:false
+import {Menu, parseFrontMatterTags, Plugin, TFile, TFolder} from 'obsidian';
+
+export const DEFAULT_SETTINGS: FolderByTagsDistributorSettings = {
+	addRibbon: false,
+	useContentTags: false,
+	useFrontMatterTags: true,
 }
 export type FolderByTagsDistributorSettings = {
-	addRibbon:boolean
+	addRibbon: boolean
+	useFrontMatterTags: boolean
+	useContentTags: boolean
 }
 export default class FolderByTagsDistributor extends Plugin {
 	settings: FolderByTagsDistributorSettings;
 
-	public redistributeAllNotes(){
+	private getExistingFolderForTags(tags: string[]): TFolder | null {
+		let currentFolder = this.app.vault.getRoot()
+		for (const tag in tags) {
+			const newPath = `${currentFolder.path}/${tag}`
+			const folder = this.app.vault.getFolderByPath(newPath)
+			if (folder) {
+				currentFolder = folder
+			}
+		}
+		return currentFolder
+	}
+
+	private resolveTagsForFolderDistribution(file: TFile) {
+		const {useContentTags, useFrontMatterTags} = this.settings
+		const cache = this.app.metadataCache.getFileCache(file)
+		if (cache) {
+			const tags: string[] = []
+			if (useContentTags) {
+				const contentTags = cache.tags
+				if (contentTags) {
+					tags.push(...contentTags.map(item => item.tag))
+				}
+			}
+			if (useFrontMatterTags) {
+				const frontMatterTags = parseFrontMatterTags(cache.frontmatter)
+				if (frontMatterTags) {
+					tags.push(...frontMatterTags)
+				}
+			}
+			return tags
+		}
+		return null
+	}
+
+	public async redistributeAllNotes() {
 		const files = this.app.vault.getMarkdownFiles()
 		for (const file of files) {
-			this.app.vault.rename(file,'')
+			const tags = this.resolveTagsForFolderDistribution(file)
+			if (tags && tags.length > 0) {
+				const folderForTags = this.getExistingFolderForTags(tags)
+				if (folderForTags) {
+					if (file.parent?.path !== folderForTags.path) {
+						await this.app.vault.rename(file, `${folderForTags.path}/${file.name}`)
+					}
+				}
+			}
 		}
 	}
+
 	async onload() {
-		const{redistributeAllNotes} = this
+		const {redistributeAllNotes} = this
 		await this.loadSettings();
 		this.addCommand({
 			id: 'redistribute-all-notes-between-the-folders-by-tags',
