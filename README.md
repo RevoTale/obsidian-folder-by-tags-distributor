@@ -1,7 +1,8 @@
 # Folder By Tags Distributor
 Tired of sorting your Obsidian notes through folders manually?
 Here is exactly what you have looked for.
-**Folder By Tags Distributor** Obsidian plugin automatically moves your notes by 
+**Folder By Tags Distributor** Obsidian plugin automatically moves your notes to directories based on the tags
+specified in your notes. 
 
 ## How to use
 Install this plugin. Do **one of the** following.
