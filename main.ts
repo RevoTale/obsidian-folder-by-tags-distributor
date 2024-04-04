@@ -46,14 +46,12 @@ export default class FolderByTagsDistributor extends Plugin {
 	}
 
 	private resolveFolderName(currentFolder: TFolder, tag: string): TFolder | null {
-		console.log('fname', currentFolder.path, tag)
 		for (const func of [this.getExactFolder, this.getUpperLetterFolder, this.getCapitalizedFolder, this.getUnderScoreFolder]) {
 			const strippedTag = stripTag(tag)
 			const currenFolderPath = normalizeFolderPath(currentFolder.path)
 			const childFolderName = func(strippedTag)
 			const folderPath = currenFolderPath === '' ? childFolderName : `${currenFolderPath}/${childFolderName}`
 			const folder = this.app.vault.getFolderByPath(folderPath)
-			console.log(folderPath, folder, this.app.vault.getAllLoadedFiles())
 			if (folder) {
 				return folder
 			}
@@ -75,10 +73,7 @@ export default class FolderByTagsDistributor extends Plugin {
 			const folder = this.resolveFolderName(currentFolder, currentTag);
 			if (folder) {
 				currentFolder = folder
-				console.log(remainingTags)
-
 				remainingTags.remove(currentTag)
-				console.log(remainingTags)
 				i = 0
 			} else {
 				i++
@@ -132,7 +127,6 @@ export default class FolderByTagsDistributor extends Plugin {
 		const files = this.app.vault.getMarkdownFiles()
 		for (const file of files) {
 			const tags = this.resolveTagsForFolderDistribution(file)
-			//console.log(`Resolving file ${file.path} for tags ${tags?.join(', ')}`)
 			if (tags && tags.length > 0) {
 				const folderForTags = this.getExistingFolderForTags(tags)
 				if (folderForTags) {
