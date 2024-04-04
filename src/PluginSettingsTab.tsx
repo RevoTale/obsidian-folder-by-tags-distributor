@@ -1,4 +1,4 @@
-import {App, PluginSettingTab, Setting} from "obsidian";
+import {App, PluginSettingTab, sanitizeHTMLToDom, Setting} from "obsidian";
 import FolderByTagsDistributor from "../main";
 
 export class PluginSettingsTab extends PluginSettingTab {
@@ -16,7 +16,7 @@ export class PluginSettingsTab extends PluginSettingTab {
 
 		new Setting(containerEl)
 			.setName("Enable Ribbon Button")
-			.setDesc("Display the Sync button on the left")
+			.setDesc(sanitizeHTMLToDom("Display the Sync button on the left <b>Heads up!</b> Reload obsidian to apply the changes."))
 			.addToggle((component) =>
 				component
 					.setValue(this.plugin.settings.addRibbon)
