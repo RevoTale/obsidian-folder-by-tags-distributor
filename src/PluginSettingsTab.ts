@@ -50,5 +50,17 @@ export class PluginSettingsTab extends PluginSettingTab {
 					})
 			)
 		;
+		new Setting(containerEl)
+			.setName("Force sequential tag to directory structure")
+			.setDesc("By default, plugin will distribute notes between folders until all tags used. By enabling this setting tag order will matter. For example, tags 'book, science' will not be placed to 'Science/Book' directory hierarchy. It means only 'Book/Science' structure will work.")
+			.addToggle((component) =>
+				component
+					.setValue(this.plugin.settings.forceSequentialTags)
+					.onChange(async (value) => {
+						this.plugin.settings.forceSequentialTags = value;
+						await this.plugin.saveSettings();
+					})
+			)
+		;
 	}
 }
