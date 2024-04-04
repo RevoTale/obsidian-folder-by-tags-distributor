@@ -1,9 +1,9 @@
 {
-	"id": "auto-folder-by-tags",
-	"name": "Folder By Tags Grouping",
-	"version": "1.0.8",
+	"id": "folder-by-tags-distributor",
+	"name": "Folder By Tags Distributor",
+	"version": "1.0.9",
 	"minAppVersion": "0.15.0",
-	"description": "Automatically group Obsidian notes into folder by tags specified in note.",
+	"description": "Automatically move Obsidian notes into existing folders by tags specified in note.",
 	"author": "RevoTale",
 	"authorUrl": "https://revotale.com",
 	"isDesktopOnly": false

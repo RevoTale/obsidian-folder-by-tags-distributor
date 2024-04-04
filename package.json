@@ -1,7 +1,7 @@
 {
-	"name": "obsidian-auto-folder-by-tags-plugin",
-	"version": "1.0.0",
-	"description": "Automatically group Obsidian notes into folder by tags specified in note.",
+	"name": "obsidian-folder-by-tags-distributor",
+	"version": "1.0.8",
+	"description": "Automatically move Obsidian notes into existing folders by tags specified in note.",
 	"main": "main.js",
 	"scripts": {
 		"dev": "node esbuild.config.mjs",
@@ -22,6 +22,5 @@
 		"typescript": "4.7.4"
 	},
 	"dependencies": {
-		"@popperjs/core": "^2.11.8"
 	}
 }
