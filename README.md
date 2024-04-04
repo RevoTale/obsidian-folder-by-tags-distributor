@@ -1,96 +1,46 @@
-# Obsidian Sample Plugin
-
-This is a sample plugin for Obsidian (https://obsidian.md).
-
-This project uses Typescript to provide type checking and documentation.
-The repo depends on the latest plugin API (obsidian.d.ts) in Typescript Definition format, which contains TSDoc comments describing what it does.
-
-**Note:** The Obsidian API is still in early alpha and is subject to change at any time!
-
-This sample plugin demonstrates some of the basic functionality the plugin API can do.
-- Adds a ribbon icon, which shows a Notice when clicked.
-- Adds a command "Open Sample Modal" which opens a Modal.
-- Adds a plugin setting tab to the settings page.
-- Registers a global click event and output 'click' to the console.
-- Registers a global interval which logs 'setInterval' to the console.
-
-## First time developing plugins?
-
-Quick starting guide for new plugin devs:
-
-- Check if [someone already developed a plugin for what you want](https://obsidian.md/plugins)! There might be an existing plugin similar enough that you can partner up with.
-- Make a copy of this repo as a template with the "Use this template" button (login to GitHub if you don't see it).
-- Clone your repo to a local development folder. For convenience, you can place this folder in your `.obsidian/plugins/your-plugin-name` folder.
-- Install NodeJS, then run `npm i` in the command line under your repo folder.
-- Run `npm run dev` to compile your plugin from `main.ts` to `main.js`.
-- Make changes to `main.ts` (or create new `.ts` files). Those changes should be automatically compiled into `main.js`.
-- Reload Obsidian to load the new version of your plugin.
-- Enable plugin in settings window.
-- For updates to the Obsidian API run `npm update` in the command line under your repo folder.
-
-## Releasing new releases
-
-- Update your `manifest.json` with your new version number, such as `1.0.1`, and the minimum Obsidian version required for your latest release.
-- Update your `versions.json` file with `"new-plugin-version": "minimum-obsidian-version"` so older versions of Obsidian can download an older version of your plugin that's compatible.
-- Create new GitHub release using your new version number as the "Tag version". Use the exact version number, don't include a prefix `v`. See here for an example: https://github.com/obsidianmd/obsidian-sample-plugin/releases
-- Upload the files `manifest.json`, `main.js`, `styles.css` as binary attachments. Note: The manifest.json file must be in two places, first the root path of your repository and also in the release.
-- Publish the release.
-
-> You can simplify the version bump process by running `npm version patch`, `npm version minor` or `npm version major` after updating `minAppVersion` manually in `manifest.json`.
-> The command will bump version in `manifest.json` and `package.json`, and add the entry for the new version to `versions.json`
-
-## Adding your plugin to the community plugin list
-
-- Check https://github.com/obsidianmd/obsidian-releases/blob/master/plugin-review.md
-- Publish an initial version.
-- Make sure you have a `README.md` file in the root of your repo.
-- Make a pull request at https://github.com/obsidianmd/obsidian-releases to add your plugin.
+# Folder By Tags Distributor
+Tired of sorting your Obsidian notes through folders manually?
+Here is exactly what you have looked for.
+**Folder By Tags Distributor** Obsidian plugin automatically moves your notes by 
 
 ## How to use
+Install this plugin. Do **one of the** following.
+- Click `Redistribute all notes to folder by tags` button (with "sync" icon) on the left panel.
+- Run `Redistribute all notes to folder by tags` command.
 
-- Clone this repo.
-- Make sure your NodeJS is at least v16 (`node --version`).
-- `npm i` or `yarn` to install dependencies.
-- `npm run dev` to start compilation in watch mode.
+**Note:** This plugin **does not** create a new folders.
+It redistributes notes between existing folder structure.
+If there is a demand for such a feature, feel free to discuss it on GitHub.
 
-## Manually installing the plugin
+**Warning!**
+This plugin puts a notes without matched directories to the root of your vault.
+Be careful!
+If there is a demand to configure such things with settings, feel free to discuss it on GitHub.
 
-- Copy over `main.js`, `styles.css`, `manifest.json` to your vault `VaultFolder/.obsidian/plugins/your-plugin-id/`.
+**Please read carefully next sections to avoid incorrect expectations. Backup your vault before usage to avoid disappointment.**
 
-## Improve code quality with eslint (optional)
-- [ESLint](https://eslint.org/) is a tool that analyzes your code to quickly find problems. You can run ESLint against your plugin to find common bugs and ways to improve your code. 
-- To use eslint with this project, make sure to install eslint from terminal:
-  - `npm install -g eslint`
-- To use eslint to analyze this project use this command:
-  - `eslint main.ts`
-  - eslint will then create a report with suggestions for code improvement by file and line number.
-- If your source code is in a folder, such as `src`, you can use eslint with this command to analyze all files in that folder:
-  - `eslint .\src\`
+## How does it work?
+Here is what happens under the hood when you trigger redistribution command.
+Plugin looks for a tags in a note.
+For each tag, plugin finds a similar folder name starting from the root of the vault.
+If a folder with tag name similar to tag is missing, plugin skips that tag. It continues search starting from the subsequent tags.
 
-## Funding URL
+**For example**, your note have multiple tags: `book`,`science` and you vault root has one folder named `/Science`.
+By clicking `Redistribute all notes to folder by tags` button your note will be moved to `/Science` directory.
+If your folder structure would be `/Science/Book`, your note will still be moved to that directory.
+The same goes with `/Book/Science`.
+But, if you have one directory named `/Other/Book/Science`, your note will be place in the root (`/`) of your vault. 
 
-You can include funding URLs where people who use your plugin can financially support it.
+The following transformation of **tag name** to **folder name** is supported:
+- Exact Folder  (book => book) 
+- Upper Letter Folder  (book => Book)  
+- Capitalized Folder (book => BOOK)
+- Underscore Folder (my_books => My Books)
 
-The simple way is to set the `fundingUrl` field to your link in your `manifest.json` file:
+## Community
+**Feel free to:**
+- Discuss plugin improvement through [GitHub discussions](https://github.com/RevoTale/obsidian-folder-by-tags-distributor-plugin/discussions). Your opinion matters!
+- Open an [issue ticket](https://github.com/RevoTale/obsidian-folder-by-tags-distributor-plugin/issues) in case you found a bug or encounter an unexpected plugin behavior. 
+- Email me with suggestions and offers
+- Open a PR in case you want to make this plugin better. **Note:** please, discuss the improvement you provide through the [GitHub discussions](https://github.com/RevoTale/obsidian-folder-by-tags-distributor-plugin/discussions) or [GitHub issues](https://github.com/RevoTale/obsidian-folder-by-tags-distributor-plugin/issues) before making a PR.
 
-```json
-{
-    "fundingUrl": "https://buymeacoffee.com"
-}
-```
-
-If you have multiple URLs, you can also do:
-
-```json
-{
-    "fundingUrl": {
-        "Buy Me a Coffee": "https://buymeacoffee.com",
-        "GitHub Sponsor": "https://github.com/sponsors",
-        "Patreon": "https://www.patreon.com/"
-    }
-}
-```
-
-## API Documentation
-
-See https://github.com/obsidianmd/obsidian-api
