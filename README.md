@@ -40,7 +40,17 @@ The following transformation of **tag name** to **folder name** is supported:
 ## Community
 **Feel free to:**
 - Discuss plugin improvement through [GitHub discussions](https://github.com/RevoTale/obsidian-folder-by-tags-distributor-plugin/discussions). Your opinion matters!
-- Open an [issue ticket](https://github.com/RevoTale/obsidian-folder-by-tags-distributor-plugin/issues) in case you found a bug or encounter an unexpected plugin behavior. 
+- Open an [issue ticket](https://github.com/RevoTale/obsidian-folder-by-tags-distributor-plugin/issues) in case you found a bug or encounter an unexpected plugin behavior.
 - Email me with suggestions and offers
 - Open a PR in case you want to make this plugin better. **Note:** please, discuss the improvement you provide through the [GitHub discussions](https://github.com/RevoTale/obsidian-folder-by-tags-distributor-plugin/discussions) or [GitHub issues](https://github.com/RevoTale/obsidian-folder-by-tags-distributor-plugin/issues) before making a PR.
+
+## Settings
+Settings description is replicated from setting tab.
+
+| Name                                        | Description                                                                                                                                                                                                                                                                 | Type    | Default |
+|---------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|---------|---------|
+| Enable left bar button                      | Display the Sync button on the left **Heads up!** Reload Obsidian to apply the changes.                                                                                                                                                                                     | boolean | false   |
+| Use FrontMatter tags for folder resolver    | Use tags specifies in 'tags' property of markdown file for distribution between folders                                                                                                                                                                                     | boolean | false   |
+| Use content tags for folder resolver        | Use tags specified inside note content for distribution between folders                                                                                                                                                                                                     | boolean | true    |
+| Force sequential tag to directory structure | By default, plugin will distribute notes between folders until all tags used. By enabling this setting tag order will matter. For example, tags 'book, science' will not be placed to 'Science/Book' directory hierarchy. It means only 'Book/Science' structure will work. | boolean | false   |
 

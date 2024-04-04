@@ -15,7 +15,7 @@ export class PluginSettingsTab extends PluginSettingTab {
 		containerEl.empty();
 
 		new Setting(containerEl)
-			.setName("Enable Ribbon Button")
+			.setName("Enable left bar button")
 			.setDesc(sanitizeHTMLToDom("Display the Sync button on the left <b>Heads up!</b> Reload Obsidian to apply the changes."))
 			.addToggle((component) =>
 				component
