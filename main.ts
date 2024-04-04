@@ -86,7 +86,7 @@ export default class FolderByTagsDistributor extends Plugin {
 				}
 			}
 		}
-		console.log(`Found folder ${currentFolder.path} for tags ${tags.join(', ')}`)
+		//console.log(`Found folder ${currentFolder.path} for tags ${tags.join(', ')}`)
 		return currentFolder
 	}
 
@@ -116,7 +116,7 @@ export default class FolderByTagsDistributor extends Plugin {
 		const files = this.app.vault.getMarkdownFiles()
 		for (const file of files) {
 			const tags = this.resolveTagsForFolderDistribution(file)
-			console.log(`Resolving file ${file.path} for tags ${tags?.join(', ')}`)
+			//console.log(`Resolving file ${file.path} for tags ${tags?.join(', ')}`)
 			if (tags && tags.length > 0) {
 				const folderForTags = this.getExistingFolderForTags(tags)
 				if (folderForTags) {
