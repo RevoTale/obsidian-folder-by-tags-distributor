@@ -1,4 +1,5 @@
 import {Menu, parseFrontMatterTags, Plugin, TFile, TFolder} from 'obsidian';
+import {PluginSettingsTab} from "./src/PluginSettingsTab";
 
 export const DEFAULT_SETTINGS: FolderByTagsDistributorSettings = {
 	addRibbon: false,
@@ -88,6 +89,7 @@ export default class FolderByTagsDistributor extends Plugin {
 				menu.showAtMouseEvent(event);
 			});
 		}
+		this.addSettingTab(new PluginSettingsTab(this.app, this));
 	}
 
 
