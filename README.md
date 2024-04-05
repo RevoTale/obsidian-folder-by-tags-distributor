@@ -38,11 +38,12 @@ The same goes with `/Book/Science`.
 But, if you have one directory named `/Other/Book/Science`, your note will be place in the root (`/`) of your vault. 
 
 The following transformation of **tag name** to **folder name** is supported:
-- Exact Folder  (book => book) 
-- Upper Letter Folder  (book => Book)  
-- Capitalized Folder (book => BOOK)
-- Underscore Folder (my_books => My Books)
-- 
+- Exact name (my_books => my_books) 
+- Tag to Capitalized First Letter (my_books => My_books)  
+- Tag to Uppercase (my_books => MY_BOOKS)
+- Snake case to Capital letter case (my_books => My Books)
+- Snake case to Pascal case (my_books => MyBooks)
+
 ## Settings
 Settings description is replicated from setting tab.
 

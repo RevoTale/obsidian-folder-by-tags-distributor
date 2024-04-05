@@ -46,9 +46,12 @@ export default class FolderByTagsDistributor extends Plugin {
 	private getUnderScoreFolder(tag: string): string {
 		return stripTag(tag).split('_').map(word => capitalizeFirstLetter(word)).join(' ')
 	}
+	private getUnderScoreImplodedFolder(tag: string): string {
+		return stripTag(tag).split('_').map(word => capitalizeFirstLetter(word)).join('')
+	}
 
 	private resolveFolderName(currentFolder: TFolder, tag: string): TFolder | null {
-		for (const func of [this.getExactFolder, this.getUpperLetterFolder, this.getCapitalizedFolder, this.getUnderScoreFolder]) {
+		for (const func of [this.getExactFolder, this.getUpperLetterFolder, this.getCapitalizedFolder, this.getUnderScoreFolder,this.getUnderScoreImplodedFolder]) {
 			const strippedTag = stripTag(tag)
 			const currenFolderPath = normalizeFolderPath(currentFolder.path)
 			const childFolderName = func(strippedTag)
