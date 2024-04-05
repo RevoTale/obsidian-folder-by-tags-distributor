@@ -8,7 +8,7 @@ export const DEFAULT_SETTINGS: FolderByTagsDistributorSettings = {
 	forceSequentialTags: false,
 	excludedFolders: [],
 	folderNameToPlaceOtherNotes: 'OtherNotes',
-	treatNestedTagsAsSeparateTagName:true
+	treatNestedTagsAsSeparateTagName: true
 }
 export type FolderByTagsDistributorSettings = {
 	addRibbon: boolean
@@ -17,7 +17,7 @@ export type FolderByTagsDistributorSettings = {
 	forceSequentialTags: boolean
 	excludedFolders: string[]
 	folderNameToPlaceOtherNotes: string
-	treatNestedTagsAsSeparateTagName:boolean
+	treatNestedTagsAsSeparateTagName: boolean
 	//TODO forceNestedTagsToBeSequential:boolean
 }
 const stripTag = (tag: string): string => {
@@ -67,10 +67,7 @@ export default class FolderByTagsDistributor extends Plugin {
 				return folder
 			}
 		}
-		const {folderNameToPlaceOtherNotes} = this.settings
-		if (folderNameToPlaceOtherNotes) {
-			return this.app.vault.getFolderByPath(formatNewPath(currentFolder, folderNameToPlaceOtherNotes))
-		}
+
 
 		return null
 	}
@@ -147,6 +144,7 @@ export default class FolderByTagsDistributor extends Plugin {
 		}
 		return false;
 	}
+
 	public async redistributeAllNotes() {
 		const files = this.app.vault.getMarkdownFiles()
 		for (const file of files) {
@@ -156,16 +154,25 @@ export default class FolderByTagsDistributor extends Plugin {
 			let tags = this.resolveTagsForFolderDistribution(file)
 			if (tags && tags.length > 0) {
 				if (this.settings.treatNestedTagsAsSeparateTagName) {
-					tags = tags.reduce<string[]>((prev,value)=>{
+					tags = tags.reduce<string[]>((prev, value) => {
 						prev.push(...value.split("/"))
 						return prev
-					},[]);
+					}, []);
 				}
-				const folderForTags = this.getExistingFolderForTags(tags)
+				let folderForTags = this.getExistingFolderForTags(tags)
+				if (folderForTags) {
+					const {folderNameToPlaceOtherNotes} = this.settings
+					if (folderNameToPlaceOtherNotes) {
+						const otherNotesFolder =  this.app.vault.getFolderByPath(formatNewPath(folderForTags, folderNameToPlaceOtherNotes))
+						if (otherNotesFolder) {
+							folderForTags = otherNotesFolder
+						}
+					}
+				}
 				if (folderForTags) {
 					if (file.parent?.path !== folderForTags.path) {
 						new Notice(`Moving file "${file.name}" to "${folderForTags.path}" folder`)
-						await this.app.vault.rename(file, formatNewPath(folderForTags,file.name))
+						await this.app.vault.rename(file, formatNewPath(folderForTags, file.name))
 					}
 				}
 			}
