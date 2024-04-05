@@ -64,7 +64,7 @@ export class PluginSettingsTab extends PluginSettingTab {
 			)
 		;
 		(new Setting(containerEl))
-			.setName("Add an excluded folder")
+			.setName("Excluded folders")
 			.setDesc('Add a folder to exclude notes from being moved by plugin')
 			.addButton((component) => {
 					component.setButtonText('Add excluded folder');

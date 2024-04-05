@@ -18,7 +18,12 @@ This plugin puts a notes without matched directories to the root of your vault.
 Be careful!
 If there is a demand to configure such things with settings, feel free to discuss it on GitHub.
 
-**Please read carefully next sections to avoid incorrect expectations. Backup your vault before usage to avoid disappointment.**
+**Warning!**
+If you use Obsidian Templates, please,
+add a folder containing your templates to list of excluded folders in setting of this plugin.
+
+**Please read carefully next sections to avoid incorrect expectations.
+Backup your vault before usage to avoid disappointment.**
 
 ## How does it work?
 Here is what happens under the hood when you trigger redistribution command.
@@ -37,6 +42,18 @@ The following transformation of **tag name** to **folder name** is supported:
 - Upper Letter Folder  (book => Book)  
 - Capitalized Folder (book => BOOK)
 - Underscore Folder (my_books => My Books)
+- 
+## Settings
+Settings description is replicated from setting tab.
+
+| Name                                        | Description                                                                                                                                                                                                                                                                 | Type     | Default  |
+|---------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|----------|----------|
+| Enable left bar button                      | Display the Sync button on the left **Heads up!** Reload Obsidian to apply the changes.                                                                                                                                                                                     | checkbox | enabled  |
+| Use FrontMatter tags for folder resolver    | Use tags specifies in 'tags' property of markdown file for distribution between folders                                                                                                                                                                                     | checkbox | enabled  |
+| Use content tags for folder resolver        | Use tags specified inside note content for distribution between folders                                                                                                                                                                                                     | checkbox | disabled |
+| Force sequential tag to directory structure | By default, plugin will distribute notes between folders until all tags used. By enabling this setting tag order will matter. For example, tags 'book, science' will not be placed to 'Science/Book' directory hierarchy. It means only 'Book/Science' structure will work. | checkbox | disabled |
+| Excluded folders                            | Add a folder list to exclude notes from being moved by plugin                                                                                                                                                                                                               | checkbox | empty    |
+
 
 ## Community
 **Feel free to:**
@@ -45,13 +62,4 @@ The following transformation of **tag name** to **folder name** is supported:
 - Email me with suggestions and offers
 - Open a PR in case you want to make this plugin better. **Note:** please, discuss the improvement you provide through the [GitHub discussions](https://github.com/RevoTale/obsidian-folder-by-tags-distributor-plugin/discussions) or [GitHub issues](https://github.com/RevoTale/obsidian-folder-by-tags-distributor-plugin/issues) before making a PR.
 
-## Settings
-Settings description is replicated from setting tab.
-
-| Name                                        | Description                                                                                                                                                                                                                                                                 | Type    | Default |
-|---------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|---------|---------|
-| Enable left bar button                      | Display the Sync button on the left **Heads up!** Reload Obsidian to apply the changes.                                                                                                                                                                                     | boolean | false   |
-| Use FrontMatter tags for folder resolver    | Use tags specifies in 'tags' property of markdown file for distribution between folders                                                                                                                                                                                     | boolean | false   |
-| Use content tags for folder resolver        | Use tags specified inside note content for distribution between folders                                                                                                                                                                                                     | boolean | true    |
-| Force sequential tag to directory structure | By default, plugin will distribute notes between folders until all tags used. By enabling this setting tag order will matter. For example, tags 'book, science' will not be placed to 'Science/Book' directory hierarchy. It means only 'Book/Science' structure will work. | boolean | false   |
 
