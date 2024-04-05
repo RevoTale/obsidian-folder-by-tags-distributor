@@ -63,6 +63,18 @@ export class PluginSettingsTab extends PluginSettingTab {
 					})
 			)
 		;
+		new Setting(containerEl)
+			.setName("Folder name to place other notes")
+			.setDesc("You can specify folder name to put notes that has no more path. Plugin will look for this name in each folder. In case specified name exist, plugin put notes that does not match over there. Make field empty to disable this option.")
+			.addText((component) =>
+				component
+					.setValue(this.plugin.settings.folderNameToPlaceOtherNotes)
+					.onChange(async (value) => {
+						this.plugin.settings.folderNameToPlaceOtherNotes = value;
+						await this.plugin.saveSettings();
+					})
+			)
+		;
 		(new Setting(containerEl))
 			.setName("Excluded folders")
 			.setDesc('Add a folder to exclude notes from being moved by plugin')

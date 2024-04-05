@@ -6,7 +6,8 @@ export const DEFAULT_SETTINGS: FolderByTagsDistributorSettings = {
 	useContentTags: false,
 	useFrontMatterTags: true,
 	forceSequentialTags: false,
-	excludedFolders: []
+	excludedFolders: [],
+	folderNameToPlaceOtherNotes: 'OtherNotes'
 }
 export type FolderByTagsDistributorSettings = {
 	addRibbon: boolean
@@ -14,18 +15,20 @@ export type FolderByTagsDistributorSettings = {
 	useContentTags: boolean
 	forceSequentialTags: boolean
 	excludedFolders: string[]
+	folderNameToPlaceOtherNotes: string
 }
 const stripTag = (tag: string): string => {
 	return tag.replace(/^#/, '');
 }
-const normalizeFolderPath = (name: string) => {
-	if (name === '/') {
-		return ''
-	}
-	return name
-}
+
 const capitalizeFirstLetter = (string: string) => {
 	return string.charAt(0).toUpperCase() + string.slice(1);
+}
+export const formatNewPath = (folder: TFolder, addPath: string) => {
+	if (folder.path === '/') {
+		return `${addPath}`
+	}
+	return `${folder.path}/${addPath}`
 }
 export default class FolderByTagsDistributor extends Plugin {
 	settings: FolderByTagsDistributorSettings;
@@ -46,22 +49,26 @@ export default class FolderByTagsDistributor extends Plugin {
 	private getUnderScoreFolder(tag: string): string {
 		return stripTag(tag).split('_').map(word => capitalizeFirstLetter(word)).join(' ')
 	}
+
 	private getUnderScoreImplodedFolder(tag: string): string {
 		return stripTag(tag).split('_').map(word => capitalizeFirstLetter(word)).join('')
 	}
 
 	private resolveFolderName(currentFolder: TFolder, tag: string): TFolder | null {
-		for (const func of [this.getExactFolder, this.getUpperLetterFolder, this.getCapitalizedFolder, this.getUnderScoreFolder,this.getUnderScoreImplodedFolder]) {
+		for (const func of [this.getExactFolder, this.getUpperLetterFolder, this.getCapitalizedFolder, this.getUnderScoreFolder, this.getUnderScoreImplodedFolder]) {
 			const strippedTag = stripTag(tag)
-			const currenFolderPath = normalizeFolderPath(currentFolder.path)
 			const childFolderName = func(strippedTag)
-			const folderPath = currenFolderPath === '' ? childFolderName : `${currenFolderPath}/${childFolderName}`
+			const folderPath = formatNewPath(currentFolder, childFolderName)
 			const folder = this.app.vault.getFolderByPath(folderPath)
 			if (folder) {
 				return folder
 			}
-
 		}
+		const {folderNameToPlaceOtherNotes} = this.settings
+		if (folderNameToPlaceOtherNotes) {
+			return this.app.vault.getFolderByPath(formatNewPath(currentFolder, folderNameToPlaceOtherNotes))
+		}
+
 		return null
 	}
 
@@ -150,7 +157,7 @@ export default class FolderByTagsDistributor extends Plugin {
 				if (folderForTags) {
 					if (file.parent?.path !== folderForTags.path) {
 						new Notice(`Moving file "${file.name}" to "${folderForTags.path}" folder`)
-						await this.app.vault.rename(file, `${normalizeFolderPath(folderForTags.path)}/${file.name}`)
+						await this.app.vault.rename(file, formatNewPath(folderForTags,file.name))
 					}
 				}
 			}
