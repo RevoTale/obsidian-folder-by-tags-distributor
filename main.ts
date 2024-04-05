@@ -2,7 +2,7 @@ import {Notice, parseFrontMatterTags, Plugin, TFile, TFolder} from 'obsidian';
 import {PluginSettingsTab} from "./src/PluginSettingsTab";
 
 export const DEFAULT_SETTINGS: FolderByTagsDistributorSettings = {
-	addRibbon: false,
+	addRibbon: true,
 	useContentTags: false,
 	useFrontMatterTags: true,
 	forceSequentialTags: false
