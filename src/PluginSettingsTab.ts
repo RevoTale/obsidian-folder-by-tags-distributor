@@ -64,6 +64,18 @@ export class PluginSettingsTab extends PluginSettingTab {
 			)
 		;
 		new Setting(containerEl)
+			.setName("Treat nested tags as separate tags")
+			.setDesc("By default, plugin treat tags of nested ('science/book') format as separate tags ('science' and 'book'). Disable this setting to apply tag name transformation to folder name as it is: 'science/book' => 'Science/book'")
+			.addToggle((component) =>
+				component
+					.setValue(this.plugin.settings.treatNestedTagsAsSeparateTagName)
+					.onChange(async (value) => {
+						this.plugin.settings.treatNestedTagsAsSeparateTagName = value;
+						await this.plugin.saveSettings();
+					})
+			)
+		;
+		new Setting(containerEl)
 			.setName("Folder name to place other notes")
 			.setDesc("You can specify folder name to put notes that has no more path. Plugin will look for this name in each folder. In case specified name exist, plugin put notes that does not match over there. Make field empty to disable this option.")
 			.addText((component) =>

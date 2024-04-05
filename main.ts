@@ -7,7 +7,8 @@ export const DEFAULT_SETTINGS: FolderByTagsDistributorSettings = {
 	useFrontMatterTags: true,
 	forceSequentialTags: false,
 	excludedFolders: [],
-	folderNameToPlaceOtherNotes: 'OtherNotes'
+	folderNameToPlaceOtherNotes: 'OtherNotes',
+	treatNestedTagsAsSeparateTagName:true
 }
 export type FolderByTagsDistributorSettings = {
 	addRibbon: boolean
@@ -16,6 +17,8 @@ export type FolderByTagsDistributorSettings = {
 	forceSequentialTags: boolean
 	excludedFolders: string[]
 	folderNameToPlaceOtherNotes: string
+	treatNestedTagsAsSeparateTagName:boolean
+	//TODO forceNestedTagsToBeSequential:boolean
 }
 const stripTag = (tag: string): string => {
 	return tag.replace(/^#/, '');
@@ -144,15 +147,20 @@ export default class FolderByTagsDistributor extends Plugin {
 		}
 		return false;
 	}
-
 	public async redistributeAllNotes() {
 		const files = this.app.vault.getMarkdownFiles()
 		for (const file of files) {
 			if (this.isFileBelongToExcludedFolder(file)) {
 				continue;
 			}
-			const tags = this.resolveTagsForFolderDistribution(file)
+			let tags = this.resolveTagsForFolderDistribution(file)
 			if (tags && tags.length > 0) {
+				if (this.settings.treatNestedTagsAsSeparateTagName) {
+					tags = tags.reduce<string[]>((prev,value)=>{
+						prev.push(...value.split("/"))
+						return prev
+					},[]);
+				}
 				const folderForTags = this.getExistingFolderForTags(tags)
 				if (folderForTags) {
 					if (file.parent?.path !== folderForTags.path) {
