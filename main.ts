@@ -5,13 +5,15 @@ export const DEFAULT_SETTINGS: FolderByTagsDistributorSettings = {
 	addRibbon: true,
 	useContentTags: false,
 	useFrontMatterTags: true,
-	forceSequentialTags: false
+	forceSequentialTags: false,
+	excludedFolders: []
 }
 export type FolderByTagsDistributorSettings = {
 	addRibbon: boolean
 	useFrontMatterTags: boolean
 	useContentTags: boolean
 	forceSequentialTags: boolean
+	excludedFolders: string[]
 }
 const stripTag = (tag: string): string => {
 	return tag.replace(/^#/, '');
@@ -123,9 +125,22 @@ export default class FolderByTagsDistributor extends Plugin {
 		return null
 	}
 
+	private isFileBelongToExcludedFolder(file: TFile): boolean {
+		const {excludedFolders} = this.settings
+		for (const folderPath of excludedFolders) {
+			if (folderPath && file.path.startsWith(folderPath)) {
+				return true
+			}
+		}
+		return false;
+	}
+
 	public async redistributeAllNotes() {
 		const files = this.app.vault.getMarkdownFiles()
 		for (const file of files) {
+			if (this.isFileBelongToExcludedFolder(file)) {
+				continue;
+			}
 			const tags = this.resolveTagsForFolderDistribution(file)
 			if (tags && tags.length > 0) {
 				const folderForTags = this.getExistingFolderForTags(tags)

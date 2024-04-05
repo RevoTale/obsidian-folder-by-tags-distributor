@@ -1,5 +1,6 @@
 import {App, PluginSettingTab, sanitizeHTMLToDom, Setting} from "obsidian";
 import FolderByTagsDistributor from "../main";
+import FolderSuggest from "./FolderSuggest";
 
 export class PluginSettingsTab extends PluginSettingTab {
 	plugin: FolderByTagsDistributor;
@@ -62,5 +63,49 @@ export class PluginSettingsTab extends PluginSettingTab {
 					})
 			)
 		;
+		(new Setting(containerEl))
+			.setName("Add an excluded folder")
+			.setDesc('Add a folder to exclude notes from being moved by plugin')
+			.addButton((component) => {
+					component.setButtonText('Add excluded folder');
+					component
+						.onClick(async () => {
+							this.plugin.settings.excludedFolders.push('');
+							await this.plugin.saveSettings();
+							this.display()
+						})
+				}
+			)
+		;
+		this.plugin.settings.excludedFolders.forEach((folderPath, index) => {
+			const s = new Setting(containerEl)
+			s.setName(folderPath?`Excluded folder "${folderPath}"`:'Please, specify the folder name to exclude in the following field.')
+			s.addSearch((cb) => {
+				new FolderSuggest(cb.inputEl, new Set(this.app.vault.getAllLoadedFiles().filter(file => this.app.vault.getFolderByPath(file.path) !== null).map(file => file.path)), async (value) => {
+					this.plugin.settings.excludedFolders[index] = value;
+					await this.plugin.saveSettings();
+					this.display()
+				}, this.app);
+				cb.inputEl.addEventListener('blur', () => {
+					this.display()
+				})
+				cb.setPlaceholder('Folder')
+					.setValue(folderPath)
+					.onChange(async (newFolder) => {
+						this.plugin.settings.excludedFolders[index] = newFolder;
+						await this.plugin.saveSettings();
+					});
+			})
+				.addExtraButton((cb) => {
+					cb.setIcon('cross')
+						.setTooltip('Delete')
+						.onClick(async () => {
+							this.plugin.settings.excludedFolders.splice(index, 1);
+							await this.plugin.saveSettings();
+							this.display()
+						});
+				});
+		});
+
 	}
 }
