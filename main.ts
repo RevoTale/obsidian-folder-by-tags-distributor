@@ -163,7 +163,7 @@ export default class FolderByTagsDistributor extends Plugin {
 				if (folderForTags) {
 					const {folderNameToPlaceOtherNotes} = this.settings
 					if (folderNameToPlaceOtherNotes) {
-						const otherNotesFolder =  this.app.vault.getFolderByPath(formatNewPath(folderForTags, folderNameToPlaceOtherNotes))
+						const otherNotesFolder = this.app.vault.getFolderByPath(formatNewPath(folderForTags, folderNameToPlaceOtherNotes))
 						if (otherNotesFolder) {
 							folderForTags = otherNotesFolder
 						}
@@ -187,11 +187,9 @@ export default class FolderByTagsDistributor extends Plugin {
 				void this.redistributeAllNotes()
 			},
 		});
-		if (this.settings.addRibbon) {
-			this.addRibbonIcon("sync", "Redistribute all notes to folder by tags", () => {
-				void this.redistributeAllNotes()
-			});
-		}
+		this.addRibbonIcon("sync", "Redistribute all notes to folder by tags", () => {
+			void this.redistributeAllNotes()
+		});
 		this.addSettingTab(new PluginSettingsTab(this.app, this));
 	}
 

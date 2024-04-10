@@ -1,9 +1,9 @@
 {
 	"id": "folder-by-tags-distributor",
-	"name": "Folder By Tags Distributor",
+	"name": "Folder by tags distributor",
 	"version": "1.0.20",
-	"minAppVersion": "0.15.0",
-	"description": "Automatically move Obsidian notes into existing folders by tags specified in note.",
+	"minAppVersion": "1.5.12",
+	"description": "Automatically move notes into existing folders by tags specified in note.",
 	"author": "RevoTale",
 	"authorUrl": "https://revotale.com",
 	"isDesktopOnly": false

@@ -28,7 +28,7 @@ export class PluginSettingsTab extends PluginSettingTab {
 			)
 		;
 		new Setting(containerEl)
-			.setName("Use FrontMatter tags for folder resolver")
+			.setName("Use frontmatter tags for folder resolver")
 			.setDesc("Use tags specifies in 'tags' property of markdown file for distribution between folders")
 			.addToggle((component) =>
 				component
@@ -103,7 +103,7 @@ export class PluginSettingsTab extends PluginSettingTab {
 		;
 		this.plugin.settings.excludedFolders.forEach((folderPath, index) => {
 			const s = new Setting(containerEl)
-			s.setName(folderPath?`Excluded folder "${folderPath}"`:'Please, specify the folder name to exclude in the following field.')
+			s.setName(folderPath ? `Excluded folder "${folderPath}"` : 'Please, specify the folder name to exclude in the following field.')
 			s.addSearch((cb) => {
 				new FolderSuggest(cb.inputEl, new Set(this.app.vault.getAllLoadedFiles().filter(file => this.app.vault.getFolderByPath(file.path) !== null).map(file => file.path)), async (value) => {
 					this.plugin.settings.excludedFolders[index] = value;
