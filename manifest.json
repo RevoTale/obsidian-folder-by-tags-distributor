@@ -1,7 +1,7 @@
 {
 	"id": "folder-by-tags-distributor",
 	"name": "Folder by tags distributor",
-	"version": "1.0.20",
+	"version": "1.0.21",
 	"minAppVersion": "1.5.12",
 	"description": "Automatically move notes into existing folders by tags specified in note.",
 	"author": "RevoTale",
