@@ -1,4 +1,6 @@
 # Folder By Tags Distributor
+<img width="1536" height="1024" alt="obsidian" src="https://github.com/user-attachments/assets/aefbf589-c46b-4d3b-a72b-fd8027f69ab7" />
+
 Tired of sorting your Obsidian notes through folders manually?
 Here is exactly what you have looked for.
 **Folder By Tags Distributor** Obsidian plugin automatically moves your notes to directories based on the tags
