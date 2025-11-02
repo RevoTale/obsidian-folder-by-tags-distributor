@@ -31,8 +31,8 @@ importers:
         specifier: 5.62.0
         version: 5.62.0(eslint@8.57.0)(typescript@5.9.3)
       builtin-modules:
-        specifier: 3.3.0
-        version: 3.3.0
+        specifier: 5.0.0
+        version: 5.0.0
       esbuild:
         specifier: 0.25.12
         version: 0.25.12
@@ -388,9 +388,9 @@ packages:
     resolution: {integrity: sha512-b8um+L1RzM3WDSzvhm6gIz1yfTbBt6YTlcEKAvsmqCZZFw46z626lVj9j1yEPW33H5H+lBQpZMP1k8l+78Ha0A==}
     engines: {node: '>=8'}
 
-  builtin-modules@3.3.0:
-    resolution: {integrity: sha512-zhaCDicdLuWN5UbN5IMnFqNMhNfo919sH85y2/ea+5Yg9TsTkeZxpL+JLbp6cgYFS4sRLp3YV4S6yDuqVWHYOw==}
-    engines: {node: '>=6'}
+  builtin-modules@5.0.0:
+    resolution: {integrity: sha512-bkXY9WsVpY7CvMhKSR6pZilZu9Ln5WDrKVBUXf2S443etkmEO4V58heTecXcUIsNsi4Rx8JUO4NfX1IcQl4deg==}
+    engines: {node: '>=18.20'}
 
   callsites@3.1.0:
     resolution: {integrity: sha512-P8BjAsXvZS+VIDUI11hHCQEv74YT67YUi5JJFNWIqL235sBmjX4+qx9Muvls5ivyNENctx46xQLQ3aTuE7ssaQ==}
@@ -1118,7 +1118,7 @@ snapshots:
     dependencies:
       fill-range: 7.0.1
 
-  builtin-modules@3.3.0: {}
+  builtin-modules@5.0.0: {}
 
   callsites@3.1.0: {}
 
