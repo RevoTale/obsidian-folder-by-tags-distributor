@@ -1,28 +1,33 @@
-import {AbstractInputSuggest, App} from "obsidian";
+import { AbstractInputSuggest, type App } from 'obsidian'
 
 export default class FolderSuggest extends AbstractInputSuggest<string> {
-	content: Set<string>;
+	content: Set<string>
 
-	constructor(private inputEl: HTMLInputElement, content: Set<string>, private onSelectCb: (value: string) => void, app: App) {
-		super(app, inputEl);
-		this.content = content;
+	constructor(
+		private readonly inputEl: HTMLInputElement,
+		content: Set<string>,
+		private readonly onSelectCb: (value: string) => void,
+		app: App,
+	) {
+		super(app, inputEl)
+		this.content = content
 	}
 
 	getSuggestions(inputStr: string): string[] {
-		const lowerCaseInputStr = inputStr.toLocaleLowerCase();
-		return [...this.content].filter((content) =>
-			content.toLocaleLowerCase().contains(lowerCaseInputStr)
-		);
+		const lowerCaseInputStr = inputStr.toLocaleLowerCase()
+		return [...this.content].filter(content =>
+			content.toLocaleLowerCase().contains(lowerCaseInputStr),
+		)
 	}
 
 	renderSuggestion(content: string, el: HTMLElement): void {
-		el.setText(content);
+		el.setText(content)
 	}
 
-	selectSuggestion(content: string, evt: MouseEvent | KeyboardEvent): void {
-		this.onSelectCb(content);
-		this.inputEl.value = "";
+	selectSuggestion(content: string, _evt: MouseEvent | KeyboardEvent): void {
+		this.onSelectCb(content)
+		this.inputEl.value = ''
 		this.inputEl.blur()
-		this.close();
+		this.close()
 	}
 }
