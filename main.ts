@@ -1,5 +1,5 @@
-import {Notice, parseFrontMatterTags, Plugin, TFile, TFolder} from 'obsidian';
-import {PluginSettingsTab} from "./src/PluginSettingsTab";
+import { Notice, Plugin, parseFrontMatterTags, type TFile, type TFolder } from 'obsidian'
+import { PluginSettingsTab } from './src/PluginSettingsTab'
 
 export const DEFAULT_SETTINGS: FolderByTagsDistributorSettings = {
 	addRibbon: true,
@@ -8,9 +8,9 @@ export const DEFAULT_SETTINGS: FolderByTagsDistributorSettings = {
 	forceSequentialTags: false,
 	excludedFolders: [],
 	folderNameToPlaceOtherNotes: 'OtherNotes',
-	treatNestedTagsAsSeparateTagName: true
+	treatNestedTagsAsSeparateTagName: true,
 }
-export type FolderByTagsDistributorSettings = {
+export interface FolderByTagsDistributorSettings {
 	addRibbon: boolean
 	useFrontMatterTags: boolean
 	useContentTags: boolean
@@ -20,13 +20,9 @@ export type FolderByTagsDistributorSettings = {
 	treatNestedTagsAsSeparateTagName: boolean
 	//TODO forceNestedTagsToBeSequential:boolean
 }
-const stripTag = (tag: string): string => {
-	return tag.replace(/^#/, '');
-}
+const stripTag = (tag: string): string => tag.replace(/^#/, '')
 
-const capitalizeFirstLetter = (string: string) => {
-	return string.charAt(0).toUpperCase() + string.slice(1);
-}
+const capitalizeFirstLetter = (string: string) => string.charAt(0).toUpperCase() + string.slice(1)
 export const formatNewPath = (folder: TFolder, addPath: string) => {
 	if (folder.path === '/') {
 		return `${addPath}`
@@ -34,7 +30,7 @@ export const formatNewPath = (folder: TFolder, addPath: string) => {
 	return `${folder.path}/${addPath}`
 }
 export default class FolderByTagsDistributor extends Plugin {
-	settings: FolderByTagsDistributorSettings;
+	settings!: FolderByTagsDistributorSettings
 
 	private getExactFolder(tag: string): string {
 		return stripTag(tag)
@@ -42,7 +38,6 @@ export default class FolderByTagsDistributor extends Plugin {
 
 	private getUpperLetterFolder(tag: string): string {
 		return capitalizeFirstLetter(stripTag(tag))
-
 	}
 
 	private getCapitalizedFolder(tag: string): string {
@@ -50,15 +45,27 @@ export default class FolderByTagsDistributor extends Plugin {
 	}
 
 	private getUnderScoreFolder(tag: string): string {
-		return stripTag(tag).split('_').map(word => capitalizeFirstLetter(word)).join(' ')
+		return stripTag(tag)
+			.split('_')
+			.map(word => capitalizeFirstLetter(word))
+			.join(' ')
 	}
 
 	private getUnderScoreImplodedFolder(tag: string): string {
-		return stripTag(tag).split('_').map(word => capitalizeFirstLetter(word)).join('')
+		return stripTag(tag)
+			.split('_')
+			.map(word => capitalizeFirstLetter(word))
+			.join('')
 	}
 
 	private resolveFolderName(currentFolder: TFolder, tag: string): TFolder | null {
-		for (const func of [this.getExactFolder, this.getUpperLetterFolder, this.getCapitalizedFolder, this.getUnderScoreFolder, this.getUnderScoreImplodedFolder]) {
+		for (const func of [
+			this.getExactFolder,
+			this.getUpperLetterFolder,
+			this.getCapitalizedFolder,
+			this.getUnderScoreFolder,
+			this.getUnderScoreImplodedFolder,
+		]) {
 			const strippedTag = stripTag(tag)
 			const childFolderName = func(strippedTag)
 			const folderPath = formatNewPath(currentFolder, childFolderName)
@@ -67,7 +74,6 @@ export default class FolderByTagsDistributor extends Plugin {
 				return folder
 			}
 		}
-
 
 		return null
 	}
@@ -79,10 +85,9 @@ export default class FolderByTagsDistributor extends Plugin {
 		while (i < remainingTags.length) {
 			const currentTag = remainingTags[i]
 			if (!currentTag) {
-				console.error(`Accessed bad index ${i}`)
 				break
 			}
-			const folder = this.resolveFolderName(currentFolder, currentTag);
+			const folder = this.resolveFolderName(currentFolder, currentTag)
 			if (folder) {
 				currentFolder = folder
 				remainingTags.remove(currentTag)
@@ -90,7 +95,6 @@ export default class FolderByTagsDistributor extends Plugin {
 			} else {
 				i++
 			}
-
 		}
 		return currentFolder
 	}
@@ -98,7 +102,7 @@ export default class FolderByTagsDistributor extends Plugin {
 	private sequentialAlgo(tags: string[]): TFolder {
 		let currentFolder = this.app.vault.getRoot()
 		for (const tag of tags) {
-			const folder = this.resolveFolderName(currentFolder, tag);
+			const folder = this.resolveFolderName(currentFolder, tag)
 			if (folder) {
 				currentFolder = folder
 			}
@@ -114,7 +118,7 @@ export default class FolderByTagsDistributor extends Plugin {
 	}
 
 	private resolveTagsForFolderDistribution(file: TFile) {
-		const {useContentTags, useFrontMatterTags} = this.settings
+		const { useContentTags, useFrontMatterTags } = this.settings
 		const cache = this.app.metadataCache.getFileCache(file)
 		if (cache) {
 			const tags: string[] = []
@@ -136,44 +140,44 @@ export default class FolderByTagsDistributor extends Plugin {
 	}
 
 	private isFileBelongToExcludedFolder(file: TFile): boolean {
-		const {excludedFolders} = this.settings
+		const { excludedFolders } = this.settings
 		for (const folderPath of excludedFolders) {
 			if (folderPath && file.path.startsWith(folderPath)) {
 				return true
 			}
 		}
-		return false;
+		return false
 	}
 
 	public async redistributeAllNotes() {
 		const files = this.app.vault.getMarkdownFiles()
 		for (const file of files) {
 			if (this.isFileBelongToExcludedFolder(file)) {
-				continue;
+				continue
 			}
 			let tags = this.resolveTagsForFolderDistribution(file)
 			if (tags && tags.length > 0) {
 				if (this.settings.treatNestedTagsAsSeparateTagName) {
 					tags = tags.reduce<string[]>((prev, value) => {
-						prev.push(...value.split("/"))
+						prev.push(...value.split('/'))
 						return prev
-					}, []);
+					}, [])
 				}
 				let folderForTags = this.getExistingFolderForTags(tags)
 				if (folderForTags) {
-					const {folderNameToPlaceOtherNotes} = this.settings
+					const { folderNameToPlaceOtherNotes } = this.settings
 					if (folderNameToPlaceOtherNotes) {
-						const otherNotesFolder = this.app.vault.getFolderByPath(formatNewPath(folderForTags, folderNameToPlaceOtherNotes))
+						const otherNotesFolder = this.app.vault.getFolderByPath(
+							formatNewPath(folderForTags, folderNameToPlaceOtherNotes),
+						)
 						if (otherNotesFolder) {
 							folderForTags = otherNotesFolder
 						}
 					}
 				}
-				if (folderForTags) {
-					if (file.parent?.path !== folderForTags.path) {
-						new Notice(`Moving file "${file.name}" to "${folderForTags.path}" folder`)
-						await this.app.vault.rename(file, formatNewPath(folderForTags, file.name))
-					}
+				if (folderForTags && file.parent?.path !== folderForTags.path) {
+					new Notice(`Moving file "${file.name}" to "${folderForTags.path}" folder`)
+					await this.app.vault.rename(file, formatNewPath(folderForTags, file.name))
 				}
 			}
 		}
@@ -182,31 +186,29 @@ export default class FolderByTagsDistributor extends Plugin {
 	private loadLayout() {
 		this.addCommand({
 			id: 'redistribute-all-notes-between-the-folders-by-tags',
-			name: "Redistribute all notes to folder by tags",
+			name: 'Redistribute all notes to folder by tags',
 			callback: () => {
 				void this.redistributeAllNotes()
 			},
-		});
-		this.addRibbonIcon("sync", "Redistribute all notes to folder by tags", () => {
+		})
+		this.addRibbonIcon('sync', 'Redistribute all notes to folder by tags', () => {
 			void this.redistributeAllNotes()
-		});
-		this.addSettingTab(new PluginSettingsTab(this.app, this));
+		})
+		this.addSettingTab(new PluginSettingsTab(this.app, this))
 	}
 
 	async onload() {
-		await this.loadSettings();
+		await this.loadSettings()
 		this.loadLayout()
 	}
 
-
-	onunload() {
-	}
+	onunload() {}
 
 	async loadSettings() {
-		this.settings = Object.assign({}, DEFAULT_SETTINGS, await this.loadData());
+		this.settings = { ...DEFAULT_SETTINGS, ...(await this.loadData()) }
 	}
 
 	async saveSettings() {
-		await this.saveData(this.settings);
+		await this.saveData(this.settings)
 	}
 }

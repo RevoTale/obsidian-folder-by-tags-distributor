@@ -1,7 +1,4 @@
 {
-  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
-  "extends": [
-    "local>RevoTale/.github:renovate-config",
-    "group:allNonMajor"
-  ]
+	"$schema": "https://docs.renovatebot.com/renovate-schema.json",
+	"extends": ["local>RevoTale/.github:renovate-config", "group:allNonMajor"]
 }
