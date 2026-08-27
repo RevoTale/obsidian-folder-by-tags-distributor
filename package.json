@@ -3,6 +3,7 @@
 	"version": "1.0.21",
 	"description": "Automatically move Obsidian notes into existing folders by tags specified in note.",
 	"main": "main.js",
+	"packageManager": "pnpm@11.23.0",
 	"scripts": {
 		"dev": "node esbuild.config.mjs",
 		"build": "tsc --noEmit --skipLibCheck && node esbuild.config.mjs production",
