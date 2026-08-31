@@ -26,7 +26,7 @@ importers:
         version: 2.5.10
       '@types/node':
         specifier: ^26.3.0
-        version: 26.3.0
+        version: 26.4.0
       builtin-modules:
         specifier: 5.3.0
         version: 5.3.0
@@ -264,8 +264,8 @@ packages:
     cpu: [x64]
     os: [win32]
 
-  '@marijn/find-cluster-break@1.0.2':
-    resolution: {integrity: sha512-l0h88YhZFyKdXIFNfSWpyjStDjGHwZ/U7iobcK1cQQD8sejsONdQtTVU+1wVN1PBw40PiiHB1vA5S7VTfQiP9g==}
+  '@marijn/find-cluster-break@1.0.4':
+    resolution: {integrity: sha512-Wy0V7+SGUjnF9/TkiM1hKVDPj7jKXduPNboMVtHTA8dySMURWqfg/JZ9E2Sq8JgSJmkl7k7Qe9FLeMSrSraWmQ==}
 
   '@types/codemirror@5.60.8':
     resolution: {integrity: sha512-VjFgDF/eB+Aklcy15TtOTLQeMjTo07k7KAjql8OK5Dirr7a6sJY4T1uVBDuTVG9VEmn1uUsohOpYnVfgC6/jyw==}
@@ -273,8 +273,8 @@ packages:
   '@types/estree@1.0.9':
     resolution: {integrity: sha512-GhdPgy1el4/ImP05X05Uw4cw2/M93BCUmnEvWZNStlCzEKME4Fkk+YpoA5OiHNQmoS7Cafb8Xa3Pya8m1Qrzeg==}
 
-  '@types/node@26.3.0':
-    resolution: {integrity: sha512-L3fgrnchriRC2ExBflb8j4uZZURHZfQsmQeyVzhjcHW4kkwVyo8/0h1B2MVzMTrYUJYu6G7EWs14hW/L9putqw==}
+  '@types/node@26.4.0':
+    resolution: {integrity: sha512-faiGnoIrLH/V8cibOMEAZ8pMw6oXqSukl29ra4mN8GdaB2ZewzeaLj+INpV5N+Z1eKWzY+IzaIZH2EIR6YZRNQ==}
 
   '@types/react-dom@19.2.5':
     resolution: {integrity: sha512-fMPwH9v7r/pp43yUd2/Mbiex5KouJwwR3dzHkhLREUC6764VyDsqxhAxv6OFEYR1RhjOyD1naqba8ECDBe7ZQg==}
@@ -411,8 +411,8 @@ packages:
     resolution: {integrity: sha512-hMQUl2bUFG339QygPM97E+mc8OY1IAchORZxm4a/frcYwKzozMzRVDBwHW0NjOqGElLm2O37AVQE8ikxlZHrMQ==}
     engines: {node: '>=18.20'}
 
-  crelt@1.0.6:
-    resolution: {integrity: sha512-VQ2MBenTq1fWZUH9DJNGti7kKv6EeAuYr3cLwxUWhIu1baTaXh4Ib5W2CqHVqib4/MqbYGJqiL3Zb8GJZr3l4g==}
+  crelt@1.0.7:
+    resolution: {integrity: sha512-aK6BbWfhf4U/wCcLHKPJl/xa6VkVstRaPywWtMKGwuOLc/wZTyQYuoxgvZnNsBvv7Kg3YTBQYYBCggcviQczuA==}
 
   csstype@3.2.3:
     resolution: {integrity: sha512-z1HGKcYy2xA8AGQfwrn0PAy+PB7X/GSj3UVJW9qKyn43xWa+gl5nXmU4qqLMRzWVLFC8KusUX8T/0kCiOYpAIQ==}
@@ -499,12 +499,12 @@ snapshots:
 
   '@codemirror/state@6.5.0':
     dependencies:
-      '@marijn/find-cluster-break': 1.0.2
+      '@marijn/find-cluster-break': 1.0.4
 
   '@codemirror/view@6.38.6':
     dependencies:
       '@codemirror/state': 6.5.0
-      crelt: 1.0.6
+      crelt: 1.0.7
       style-mod: 4.1.3
       w3c-keyname: 2.2.8
 
@@ -586,7 +586,7 @@ snapshots:
   '@esbuild/win32-x64@0.28.2':
     optional: true
 
-  '@marijn/find-cluster-break@1.0.2': {}
+  '@marijn/find-cluster-break@1.0.4': {}
 
   '@types/codemirror@5.60.8':
     dependencies:
@@ -594,7 +594,7 @@ snapshots:
 
   '@types/estree@1.0.9': {}
 
-  '@types/node@26.3.0':
+  '@types/node@26.4.0':
     dependencies:
       undici-types: 8.3.0
 
@@ -672,7 +672,7 @@ snapshots:
 
   builtin-modules@5.3.0: {}
 
-  crelt@1.0.6: {}
+  crelt@1.0.7: {}
 
   csstype@3.2.3: {}
 
