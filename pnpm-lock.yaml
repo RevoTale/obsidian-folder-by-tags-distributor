@@ -25,7 +25,7 @@ importers:
         specifier: 2.5.10
         version: 2.5.10
       '@types/node':
-        specifier: ^26.3.0
+        specifier: 26.4.0
         version: 26.4.0
       builtin-modules:
         specifier: 5.3.0
