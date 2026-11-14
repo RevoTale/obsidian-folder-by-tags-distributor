@@ -1,0 +1,26 @@
+when:
+  - event: [pull_request, tag]
+
+steps:
+  - name: build-plugin
+    image: node:24-bookworm@sha256:9d266751ca3d7fdbe651c878ffd5ad0a42fed49a18c283509267c97f025b7496
+    commands:
+      - npm install --global pnpm@12.3.1
+      - pnpm install --frozen-lockfile
+      - pnpm run build
+      - test -s main.js && test -s manifest.json && test -s styles.css
+
+  - name: create-draft-release
+    image: woodpeckerci/plugin-release:1.0.0@sha256:13277e795ac97a41e0e89a0b001e31a561baff912dcfe272a267bee0dda08fa1
+    when:
+      - event: tag
+    settings:
+      api_key:
+        from_secret: forge_token
+      title: ${CI_COMMIT_TAG}
+      draft: true
+      files:
+        - main.js
+        - manifest.json
+        - styles.css
+      file_exists: fail
